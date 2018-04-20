@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         classNameEditText = (EditText) findViewById(R.id.classNameEditText);
-        sectionPercentEditText = (EditText) findViewById(R.id.sectionPercentEditText);
+        sectionPercentEditText = (EditText) findViewById(R.id.sectionPercentEditText); //FIXME leaving these three lines here causes the progrma to crash
         studentPercentEditText = (EditText) findViewById(R.id.studentPercentEditText);
+
 
         Bundle extras = getIntent().getExtras(); // get Bundle of extras
         if (extras != null) {
@@ -51,10 +52,14 @@ public class MainActivity extends AppCompatActivity {
         // opens (creates and/or updates, as required) the database
         db = dbHelper.getWritableDatabase();
 
+        setContentView(R.layout.add_class);
         Button saveSectionButton = (Button) findViewById(R.id.saveSection);
             saveSectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+              /*  classNameEditText = (EditText) findViewById(R.id.classNameEditText);
+                sectionPercentEditText = (EditText) findViewById(R.id.sectionPercentEditText);
+                studentPercentEditText = (EditText) findViewById(R.id.studentPercentEditText);*/ //FIXME putting this here causes the dreaded bouncing screen
                 if (classNameEditText.getText().length() != 0 &&
                         sectionPercentEditText.getText().length() != 0
                         && studentPercentEditText.getText().length() != 0) {
@@ -88,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * saves section information to the database
+     */
     private void saveSection() {
         // the values to insert or update for the section
         ContentValues values = new ContentValues();
@@ -107,5 +114,11 @@ public class MainActivity extends AppCompatActivity {
             db.update(gradeContract.Section.TABLE_NAME, values,
                     gradeContract.Section._ID + "=" + classSectionID, null);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        db.close();                    // close the database
+        super.onDestroy();
     }
 }
