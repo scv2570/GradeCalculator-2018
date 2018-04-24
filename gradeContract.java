@@ -21,6 +21,7 @@ public class gradeContract {
     // Inner class defines the table contents
     public static abstract class Section implements BaseColumns {
         public static final String TABLE_NAME = "class_sections";
+        public static final String COLUMN_NAME_ID = "_id";
         public static final String COLUMN_NAME_CLASS_NAME = "class_name";
         public static final String COLUMN_NAME_SECTION_PERCENTAGE = "section_percentage";
         public static final String COLUMN_NAME_STUDENT_PERCENTAGE = "student_percentage";

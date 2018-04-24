@@ -1,124 +1,72 @@
 package com.example.scv2570.gradecalculator;
 
-import android.app.AlertDialog;
-import android.content.ContentValues;
+
+
+import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
-import java.util.ArrayList;
+public class MainActivity extends Activity {
+    public static final String ROW_ID = "row_id"; // Intent extra key
 
-public class MainActivity extends AppCompatActivity {
-    private long classSectionID; // id of the class section
-
-    //editTexts for class info
-    private EditText classNameEditText;
-    private EditText sectionPercentEditText;
-    private EditText studentPercentEditText;
-
+    private CursorAdapter adapter;                // adapter for ListView
+    private GradeDbHelper dbHelper;               // manages database
     private SQLiteDatabase db;                    // the database object
 
 
-    // called when the Activity is first started
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
-        classNameEditText = (EditText) findViewById(R.id.classNameEditText);
-        sectionPercentEditText = (EditText) findViewById(R.id.sectionPercentEditText); //FIXME leaving these three lines here causes the progrma to crash
-        studentPercentEditText = (EditText) findViewById(R.id.studentPercentEditText);
-
-
-        Bundle extras = getIntent().getExtras(); // get Bundle of extras
-        if (extras != null) {
-            classSectionID = extras.getLong("class_section_id");
-            classNameEditText.setText(extras.getString("class_name"));
-            sectionPercentEditText.setText(extras.getString("section_percent"));
-            studentPercentEditText.setText(extras.getString("student_percent"));
+@Override
+protected  void  onCreate(final Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.content_main);
+}
+public void setButton(View view){
+    Button button= (Button) findViewById(R.id.addClass);
+    button.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this,AddSection.class);
+            startActivity(intent);
         }
+    });
+
+}
+
+    @Override
+    protected void onStart() {
+        super.onStart(); // call super's onResume method
+
         // setup the database helper
-        GradeDbHelper dbHelper = new GradeDbHelper(this);
+        dbHelper = new GradeDbHelper(this);
 
         // opens (creates and/or updates, as required) the database
         db = dbHelper.getWritableDatabase();
 
-        setContentView(R.layout.add_class);
-        Button saveSectionButton = (Button) findViewById(R.id.saveSection);
-            saveSectionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              /*  classNameEditText = (EditText) findViewById(R.id.classNameEditText);
-                sectionPercentEditText = (EditText) findViewById(R.id.sectionPercentEditText);
-                studentPercentEditText = (EditText) findViewById(R.id.studentPercentEditText);*/ //FIXME putting this here causes the dreaded bouncing screen
-                if (classNameEditText.getText().length() != 0 &&
-                        sectionPercentEditText.getText().length() != 0
-                        && studentPercentEditText.getText().length() != 0) {
-                    AsyncTask<Object, Object, Object> saveSection =
-                            new AsyncTask<Object, Object, Object>() {
-                                @Override
-                                protected Object doInBackground(Object... params) {
-                                    saveSection(); // save section to the database
-                                    return null;
-                                }
-
-                                @Override
-                                protected void onPostExecute(Object result) {
-                                    finish(); // return to the previous Activity
-                                }
-                            };
-
-                    // save the section to the database using a separate thread
-                    saveSection.execute((Object[]) null);
-                } else {
-                    // create a new AlertDialog Builder
-                    AlertDialog.Builder builder =
-                            new AlertDialog.Builder(MainActivity.this);
-
-                    // set dialog title & message, and provide Button to dismiss
-                    builder.setTitle(R.string.errorTitle);
-                    builder.setMessage(R.string.errorMessage);
-                    builder.setPositiveButton(R.string.errorButton, null);
-                    builder.show(); // display the Dialog
-                }
-            }
-        });
     }
-    /**
-     * saves section information to the database
-     */
-    private void saveSection() {
-        // the values to insert or update for the section
-        ContentValues values = new ContentValues();
-
-        values.put(gradeContract.Section.COLUMN_NAME_CLASS_NAME,
-                classNameEditText.getText().toString());
-        values.put(gradeContract.Section.COLUMN_NAME_SECTION_PERCENTAGE,
-                sectionPercentEditText.getText().toString());
-        values.put(gradeContract.Section.COLUMN_NAME_STUDENT_PERCENTAGE,
-                studentPercentEditText.getText().toString());
+    // performs database query outside GUI thread
 
 
-        if (getIntent().getExtras() == null) {
-            db.insert(gradeContract.Section.TABLE_NAME, null, values);
-        } else {
-            db.update(gradeContract.Section.TABLE_NAME, values,
-                    gradeContract.Section._ID + "=" + classSectionID, null);
+
+    // handle choice from options menu
+    public boolean onAddSectionButton() {
+
+                // create a new Intent to launch the AddSection Activity
+                Intent addNewSection = new Intent(MainActivity.this, AddSection.class);
+                startActivity(addNewSection);               // start the AddEditMovie Activity
+                return true;
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        db.close();                    // close the database
-        super.onDestroy();
-    }
-}
+
+
+
+
